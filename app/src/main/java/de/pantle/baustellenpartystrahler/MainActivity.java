@@ -32,14 +32,21 @@ public class MainActivity extends AppCompatActivity {
     SimpleBluetoothDeviceInterface device;
 
     TextView label;
+    TextView viewSpeed;
+    TextView viewSpeed2;
     Button buttonMode0;
     Button buttonMode1;
     Button buttonMode2;
+    Button buttonMode4;
     Button buttonFColor;
     Button buttonBColor;
     SeekBar seekBarSpeed;
     SeekBar seekBarSpeed2;
     SeekBar seekBarBrightness;
+
+    int color= Color.WHITE;
+    int color2= Color.BLACK;
+    int mode=0;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -47,25 +54,41 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         label = findViewById(R.id.label);
-        buttonMode0 = findViewById(R.id.buttonMode0);
-        buttonMode1 = findViewById(R.id.buttonMode1);
-        buttonMode2 = findViewById(R.id.buttonMode2);
+        buttonMode0 = findViewById(R.id.buttonlangweilig);
+        buttonMode1 = findViewById(R.id.buttonKreis);
+        buttonMode2 = findViewById(R.id.buttonBaustelle);
+        buttonMode4 = findViewById(R.id.buttonBlinken);
         buttonFColor = findViewById(R.id.buttonFColor);
         buttonBColor = findViewById(R.id.buttonBColor);
         seekBarSpeed = findViewById(R.id.seekBarSpeed);
         seekBarSpeed2 = findViewById(R.id.seekBarSpeed2);
         seekBarBrightness = findViewById(R.id.seekBarBrightness);
+        viewSpeed= findViewById(R.id.textspeed);
+        viewSpeed2= findViewById(R.id.textspeed2);
 
         label.setText("noch nicht verbunden");
 
+        designchanges();
+
         buttonMode0.setOnClickListener((View v) -> {
-            sendMessage("mode:0");
+            mode=0;
+            sendMessage("mode:" + mode);
+            designchanges();
         });
         buttonMode1.setOnClickListener((View v) -> {
-            sendMessage("mode:1");
+            mode=1;
+            sendMessage("mode:" + mode);
+            designchanges();
         });
         buttonMode2.setOnClickListener((View v) -> {
-            sendMessage("mode:2");
+            mode=2;
+            sendMessage("mode:" + mode);
+            designchanges();
+        });
+        buttonMode4.setOnClickListener((View v) -> {
+            mode=4;
+            sendMessage("mode:" + mode);
+            designchanges();
         });
         buttonFColor.setOnClickListener((View v) -> {
             openColorPickerDialogFColor();
@@ -152,12 +175,60 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    private void designchanges() {
+        if (mode==0) {
+            viewSpeed.setVisibility(View.INVISIBLE);
+            seekBarSpeed.setVisibility(View.INVISIBLE);
+            buttonBColor.setVisibility(View.GONE);
+            buttonMode0.setBackgroundColor(Color.parseColor("#FAFAFA"));
+        }else {
+            viewSpeed.setVisibility(View.VISIBLE);
+            seekBarSpeed.setVisibility(View.VISIBLE);
+            buttonBColor.setVisibility(View.VISIBLE);
+            buttonMode0.setBackgroundColor(Color.parseColor("#018577"));
+
+        }
+
+        if (mode==1) {
+            buttonMode1.setBackgroundColor(Color.parseColor("#FAFAFA"));
+            seekBarSpeed.setMax(300);
+        }else {
+            seekBarSpeed.setMax(3000);
+            buttonMode1.setBackgroundColor(Color.parseColor("#018577"));
+        }
+
+        if (mode==2) {
+            buttonFColor.setBackgroundColor(Color.rgb(255, 155, 0));
+            buttonBColor.setBackgroundColor(Color.rgb(0, 0, 0));
+            buttonMode2.setBackgroundColor(Color.parseColor("#FAFAFA"));
+            seekBarSpeed.setProgress(2500);
+        }else {
+            buttonFColor.setBackgroundColor(color);
+            buttonBColor.setBackgroundColor(color2);
+            buttonMode2.setBackgroundColor(Color.parseColor("#018577"));
+        }
+
+        if (mode==4) {
+            viewSpeed2.setVisibility(View.VISIBLE);
+            seekBarSpeed2.setVisibility(View.VISIBLE);
+            buttonMode4.setBackgroundColor(Color.parseColor("#FAFAFA"));
+        }else {
+            viewSpeed2.setVisibility(View.INVISIBLE);
+            seekBarSpeed2.setVisibility(View.INVISIBLE);
+            buttonMode4.setBackgroundColor(Color.parseColor("#018577"));
+        }
+
+    }
+
 
     private void openColorPickerDialogFColor() {
         new ColorPickerDialog()
+                .withColor(color)
                 .withAlphaEnabled(false)
-                .withPresets(Color.rgb(255, 156, 0), Color.BLACK, Color.WHITE, Color.RED, Color.GREEN, Color.BLUE)
+                .withPresets(Color.BLACK, Color.WHITE, Color.RED, Color.GREEN, Color.BLUE, Color.YELLOW, Color.rgb(255, 156, 0), Color.CYAN, Color.MAGENTA)
                 .withListener((@Nullable ColorPickerDialog pickerView, int color) -> {
+                    this.color= color;
+                    buttonFColor.setBackgroundColor(color);
                     sendMessage("fcolor:" + colorIntToHex(color));
                 })
                 .show(getSupportFragmentManager(), "colorPicker");
@@ -165,9 +236,13 @@ public class MainActivity extends AppCompatActivity {
 
     private void openColorPickerDialogBColor() {
         new ColorPickerDialog()
+                .withColor(color2)
                 .withAlphaEnabled(false)
+                .withPresets(Color.BLACK, Color.WHITE, Color.RED, Color.GREEN, Color.BLUE, Color.YELLOW, Color.rgb(255, 156, 0), Color.CYAN, Color.MAGENTA)
                 .withListener((@Nullable ColorPickerDialog pickerView, int color) -> {
-                    sendMessage("bcolor:" + colorIntToHex(color));
+                    this.color2= color;
+                 buttonBColor.setBackgroundColor(color2);
+                    sendMessage("bcolor:" + colorIntToHex(color2));
                 })
                 .show(getSupportFragmentManager(), "colorPicker");
     }
