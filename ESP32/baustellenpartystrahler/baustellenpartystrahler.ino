@@ -1,13 +1,123 @@
 
-//#include <timer.h>
-//Timer timer = timer_create_default();
-//auto ledTimer;
+
+#include "definitions.h"
+#include "ledstrip.cpp"
+#include "standardmode.cpp"
+#include "circlemode.cpp"
+#include "baustellenmode.cpp"
+#include "blinkmode.cpp"
+
+LedStrip ledStrip;
+Mode *currentMode;
+
+
+// TODO: entfernen
+int temp;
+int counter;
+int counter2;
+int ledMode = 0;
+String receivedData;
+#define DELIMITER ":"
+
+
+void setup() {
+  Serial.begin(115200);
+  Serial.println("Program started.");
+  
+  ESP_BT.begin("Baustellenpartystrahler");
+  Serial.println("Bluetooth device is ready to pair.");
+
+  currentMode = new StandardMode();
+}
+
+void loop() {
+  //Check if we receive anything from Bluetooth
+  if (ESP_BT.available()) {
+    receiveData();
+    parseReceivedData();
+  }
+
+  currentMode->update();
+}
+
+
+void receiveData() {
+  receivedData = "";
+  char c;
+  while (ESP_BT.available()) {
+    c = ESP_BT.read();
+    receivedData += c;
+  }
+  Serial.println("received data: " + receivedData);
+}
+
+void parseReceivedData() {
+  if(receivedData.indexOf(DELIMITER) == -1) {
+    Serial.println("parse error: no delimiter");
+    return;
+  }
+
+  char tmp[50];
+  receivedData.toCharArray(tmp, 50);
+  String key = String(strtok(tmp, DELIMITER));
+  long val = strtol(strtok(NULL, DELIMITER), 0, 16);
+
+  Serial.println("key: " + key);
+  Serial.println("val: " + String(val));
+
+  if(key.equals("")) {
+    Serial.println("error: no key");
+    return;
+  }
+
+  if (key.equals("mode")) {
+    if(val == 0) {
+      currentMode = new StandardMode();
+      Serial.println("standard mode set!!");
+    }
+    else if(val == 1) {
+      currentMode = new CircleMode();
+      Serial.println("circle mode set!!");
+    }
+    else if(val == 2) {
+      currentMode = new BaustellenMode();
+      Serial.println("baustellen mode set!!");
+    }
+    else if(val == 4) {
+      currentMode = new BlinkMode();
+      Serial.println("blink mode set!!");
+    }
+  }
+  else if (key.equals("fcolor")) {
+    currentMode->setFColor(val);
+  }
+  else if (key.equals("bcolor")) {
+    currentMode->setBColor(val);
+  }
+  else if (key.equals("bright")) {
+    ledStrip.setBrightness(val);
+  }
+  else if (key.equals("speed")) {
+    currentMode->setSpeed(val);
+  }
+  else if (key.equals("speed2")) {
+    currentMode->setSpeed2(val);
+  }
+}
+
+
+
+
+
+/*
+
 
 #include <FastLED.h>
 
 #define LED_COUNT 17
 #define LED_PIN 18
-CRGB leds[LED_COUNT];
+
+#include "ledstrip.h"
 
 int temp;
 int counter;
@@ -29,13 +139,10 @@ BluetoothSerial ESP_BT;
 void setup() {
   Serial.begin(9600);
 
-  FastLED.addLeds<NEOPIXEL, LED_PIN>(leds, LED_COUNT);
-  FastLED.setBrightness(255);
+
 
   ESP_BT.begin("Baustellenpartystrahler");
   Serial.println("Bluetooth Device is Ready to Pair");
-
-  //ledTimer = timer.every(speed, updateLeds());
 }
 
 void loop() {
@@ -46,7 +153,6 @@ void loop() {
   }
 
   updateLeds();
-  //timer.tick();
 }
 
 void receiveData() {
@@ -87,8 +193,6 @@ void parseReceivedData() {
   }
   else if (key.equals("speed")) {
     setSpeed(val);
-    //timer.cancel(ledTimer);
-    //ledTimer = timer.every(speed, updateLeds);
   }
   else if (key.equals("speed2")) {
     setSpeed2(val);
@@ -100,7 +204,6 @@ void setMode(long val) {
     if(val == validLedModes[i]) {
     Serial.println("setMode success: mode " + String(val) + " found");
       ledMode = val;
-      //startMode(ledMode);
       return;
     }
   }
@@ -124,18 +227,6 @@ void setSpeed2(long val) {
   speed2 = val;
 }
 
-
-//void startMode() {
-//  if (ledMode == MODE_ALL_FCOLOR) {
-//    modeAllLedsFColor();
-//  }
-//  else if (ledMode == MODE_CIRCLE) {
-//    modeCircle();
-//  }
-//  else if (ledMode == MODE_BAUSTELLE) {
-//    modeBaustelle();
-//  }
-//}
 void updateLeds() {
   if (ledMode == MODE_ALL_FCOLOR) {
     modeAllLedsFColor();
@@ -248,3 +339,5 @@ void updateLeds() {
     FastLED.show();
   }
 }
+
+*/
