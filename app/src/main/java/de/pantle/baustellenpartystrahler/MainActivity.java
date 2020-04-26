@@ -27,6 +27,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import me.jfenn.colorpickerdialog.dialogs.ColorPickerDialog;
 
+
 public class MainActivity extends AppCompatActivity {
     BluetoothManager bluetoothManager;
     SimpleBluetoothDeviceInterface device;
@@ -184,24 +185,29 @@ public class MainActivity extends AppCompatActivity {
         }else {
             viewSpeed.setVisibility(View.VISIBLE);
             seekBarSpeed.setVisibility(View.VISIBLE);
-            buttonBColor.setVisibility(View.VISIBLE);
             buttonMode0.setBackgroundColor(Color.parseColor("#018577"));
 
         }
 
         if (mode==1) {
+            buttonBColor.setVisibility(View.VISIBLE);
             buttonMode1.setBackgroundColor(Color.parseColor("#FAFAFA"));
             seekBarSpeed.setMax(300);
+            seekBarSpeed.setProgress(100);
         }else {
-            seekBarSpeed.setMax(3000);
+            seekBarSpeed.setMax(2000);
+            seekBarSpeed.setProgress(1000);
+            seekBarSpeed2.setProgress(1000);
             buttonMode1.setBackgroundColor(Color.parseColor("#018577"));
         }
 
         if (mode==2) {
+            buttonBColor.setVisibility(View.GONE);
             buttonFColor.setBackgroundColor(Color.rgb(255, 155, 0));
+            color= (Color.rgb(255, 155, 0));
             buttonBColor.setBackgroundColor(Color.rgb(0, 0, 0));
+            color2 = (Color.rgb(0, 0, 0));
             buttonMode2.setBackgroundColor(Color.parseColor("#FAFAFA"));
-            seekBarSpeed.setProgress(2500);
         }else {
             buttonFColor.setBackgroundColor(color);
             buttonBColor.setBackgroundColor(color2);
@@ -209,6 +215,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         if (mode==4) {
+            buttonBColor.setVisibility(View.VISIBLE);
             viewSpeed2.setVisibility(View.VISIBLE);
             seekBarSpeed2.setVisibility(View.VISIBLE);
             buttonMode4.setBackgroundColor(Color.parseColor("#FAFAFA"));
@@ -217,6 +224,18 @@ public class MainActivity extends AppCompatActivity {
             seekBarSpeed2.setVisibility(View.INVISIBLE);
             buttonMode4.setBackgroundColor(Color.parseColor("#018577"));
         }
+
+        update();
+
+
+    }
+
+    private void update() {
+        sendMessage("fcolor:" + colorIntToHex(color));
+        sendMessage("bcolor:" + colorIntToHex(color2));
+        sendMessage("bright:" + Integer.toHexString(seekBarBrightness.getProgress()));
+        sendMessage("speed:" + Integer.toHexString(seekBarSpeed.getMax() - seekBarSpeed.getProgress()));
+        sendMessage("speed2:" + Integer.toHexString(seekBarSpeed2.getMax() - seekBarSpeed2.getProgress()));
 
     }
 
