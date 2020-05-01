@@ -12,7 +12,9 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ListView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -34,20 +36,26 @@ public class MainActivity extends AppCompatActivity {
 
     TextView label;
     TextView viewSpeed;
-    TextView viewSpeed2;
     Button buttonMode0;
     Button buttonMode1;
     Button buttonMode2;
+    Button buttonMode3;
     Button buttonMode4;
     Button buttonFColor;
     Button buttonBColor;
+    Button modus1;
+    Button modus2;
+    Button modus3;
+    Button modus4;
+
     SeekBar seekBarSpeed;
-    SeekBar seekBarSpeed2;
     SeekBar seekBarBrightness;
+  //  ListView listmodi;
 
     int color= Color.WHITE;
     int color2= Color.BLACK;
     int mode=0;
+
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -58,18 +66,27 @@ public class MainActivity extends AppCompatActivity {
         buttonMode0 = findViewById(R.id.buttonlangweilig);
         buttonMode1 = findViewById(R.id.buttonKreis);
         buttonMode2 = findViewById(R.id.buttonBaustelle);
+        buttonMode3 = findViewById(R.id.buttonRainbow);
         buttonMode4 = findViewById(R.id.buttonBlinken);
         buttonFColor = findViewById(R.id.buttonFColor);
         buttonBColor = findViewById(R.id.buttonBColor);
+        modus1 = findViewById(R.id.modi1);
+        modus2 = findViewById(R.id.modi2);
+        modus3 = findViewById(R.id.modi3);
+        modus4 = findViewById(R.id.modi4);
         seekBarSpeed = findViewById(R.id.seekBarSpeed);
-        seekBarSpeed2 = findViewById(R.id.seekBarSpeed2);
         seekBarBrightness = findViewById(R.id.seekBarBrightness);
         viewSpeed= findViewById(R.id.textspeed);
-        viewSpeed2= findViewById(R.id.textspeed2);
+       // listmodi = findViewById(R.id.lightmodi);
 
         label.setText("noch nicht verbunden");
 
         designchanges();
+
+        /*ArrayAdapter adapter = new ArrayAdapter<String>
+                (this, android.R.layout.simple_list_item_single_choice, modi);
+        listmodi.setAdapter(adapter);
+*/
 
         buttonMode0.setOnClickListener((View v) -> {
             mode=0;
@@ -86,6 +103,11 @@ public class MainActivity extends AppCompatActivity {
             sendMessage("mode:" + mode);
             designchanges();
         });
+        buttonMode3.setOnClickListener((View v) -> {
+            mode=3;
+            sendMessage("mode:" + mode);
+            designchanges();
+        });
         buttonMode4.setOnClickListener((View v) -> {
             mode=4;
             sendMessage("mode:" + mode);
@@ -96,6 +118,10 @@ public class MainActivity extends AppCompatActivity {
         });
         buttonBColor.setOnClickListener((View v) -> {
             openColorPickerDialogBColor();
+        });
+        modus1.setOnClickListener((View v) -> {
+            mode=101;
+            sendMessage("mode:" + mode);
         });
         seekBarSpeed.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
@@ -109,20 +135,6 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
                 sendMessage("speed:" + Integer.toHexString(seekBar.getMax() - seekBar.getProgress()));
-            }
-        });
-        seekBarSpeed2.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-            }
-
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-            }
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-                sendMessage("speed2:" + Integer.toHexString(seekBar.getMax() - seekBar.getProgress()));
             }
         });
         seekBarBrightness.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
@@ -182,7 +194,20 @@ public class MainActivity extends AppCompatActivity {
             seekBarSpeed.setVisibility(View.INVISIBLE);
             buttonBColor.setVisibility(View.GONE);
             buttonMode0.setBackgroundColor(Color.parseColor("#FAFAFA"));
+            modus1.setText("Langweilig");
+            modus2.setText("Random");
+            modus3.setText("SingleAuto");
+            modus4.setText("FullAuto");
+            modus1.setVisibility(View.VISIBLE);
+            modus2.setVisibility(View.VISIBLE);
+            modus3.setVisibility(View.VISIBLE);
+            modus4.setVisibility(View.VISIBLE);
+            update();
         }else {
+            modus1.setVisibility(View.GONE);
+            modus2.setVisibility(View.GONE);
+            modus3.setVisibility(View.GONE);
+            modus4.setVisibility(View.GONE);
             viewSpeed.setVisibility(View.VISIBLE);
             seekBarSpeed.setVisibility(View.VISIBLE);
             buttonMode0.setBackgroundColor(Color.parseColor("#018577"));
@@ -194,10 +219,10 @@ public class MainActivity extends AppCompatActivity {
             buttonMode1.setBackgroundColor(Color.parseColor("#FAFAFA"));
             seekBarSpeed.setMax(300);
             seekBarSpeed.setProgress(100);
+            update();
         }else {
-            seekBarSpeed.setMax(2000);
+            seekBarSpeed.setMax(5000);
             seekBarSpeed.setProgress(1000);
-            seekBarSpeed2.setProgress(1000);
             buttonMode1.setBackgroundColor(Color.parseColor("#018577"));
         }
 
@@ -214,18 +239,28 @@ public class MainActivity extends AppCompatActivity {
             buttonMode2.setBackgroundColor(Color.parseColor("#018577"));
         }
 
+        if (mode==3) {
+            buttonBColor.setVisibility(View.GONE);
+            buttonFColor.setVisibility(View.GONE);
+            seekBarSpeed.setMax(20000);
+            seekBarSpeed.setProgress(5000);
+            buttonMode3.setBackgroundColor(Color.parseColor("#FAFAFA"));
+        }else {
+            buttonFColor.setVisibility(View.VISIBLE);
+            buttonFColor.setBackgroundColor(color);
+            buttonBColor.setBackgroundColor(color2);
+            buttonMode3.setBackgroundColor(Color.parseColor("#018577"));
+
+        }
+
         if (mode==4) {
             buttonBColor.setVisibility(View.VISIBLE);
-            viewSpeed2.setVisibility(View.VISIBLE);
-            seekBarSpeed2.setVisibility(View.VISIBLE);
             buttonMode4.setBackgroundColor(Color.parseColor("#FAFAFA"));
         }else {
-            viewSpeed2.setVisibility(View.INVISIBLE);
-            seekBarSpeed2.setVisibility(View.INVISIBLE);
             buttonMode4.setBackgroundColor(Color.parseColor("#018577"));
         }
 
-        update();
+        //update(); gab ne fehlermeldung beim rainbow
 
 
     }
@@ -235,7 +270,6 @@ public class MainActivity extends AppCompatActivity {
         sendMessage("bcolor:" + colorIntToHex(color2));
         sendMessage("bright:" + Integer.toHexString(seekBarBrightness.getProgress()));
         sendMessage("speed:" + Integer.toHexString(seekBarSpeed.getMax() - seekBarSpeed.getProgress()));
-        sendMessage("speed2:" + Integer.toHexString(seekBarSpeed2.getMax() - seekBarSpeed2.getProgress()));
 
     }
 
