@@ -219,7 +219,6 @@ public class MainActivity extends AppCompatActivity {
             buttonMode1.setBackgroundColor(Color.parseColor("#FAFAFA"));
             seekBarSpeed.setMax(300);
             seekBarSpeed.setProgress(100);
-            update();
         }else {
             seekBarSpeed.setMax(5000);
             seekBarSpeed.setProgress(1000);
